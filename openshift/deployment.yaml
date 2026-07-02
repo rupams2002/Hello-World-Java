@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-java
+  namespace: rupams2002-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-java
+  template:
+    metadata:
+      labels:
+        app: hello-world-java
+    spec:
+      containers:
+        - name: hello-world-java
+          image: 921570401160.dkr.ecr.us-east-1.amazonaws.com/hello-world-java:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-java
+  namespace: rupams2002-dev
+spec:
+  selector:
+    app: hello-world-java
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello-world-java
+  namespace: rupams2002-dev
+spec:
+  to:
+    kind: Service
+    name: hello-world-java
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
